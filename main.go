@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	dir = flag.String("dir", ".", "Directory to serve files from")
+	dir = flag.String("dir", "./captures", "Directory to serve files from")
 )
 
 func main() {
