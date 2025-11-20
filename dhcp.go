@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/google/gopacket"
@@ -23,27 +24,35 @@ func processPcapFile(filename string) error {
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	for packet := range packetSource.Packets() {
-		printDHCPv4(packet)
+		dhcpLayer := packet.Layer(layers.LayerTypeDHCPv4)
+		if dhcpLayer == nil {
+			return errors.New("no DHCPv4 layer found")
+		}
+		fmt.Printf("{")
+		for _, b := range dhcpLayer.LayerContents() {
+			fmt.Printf("0x%02x, ", b)
+		}
+		fmt.Println("},")
 	}
 
 	return nil
 }
 
-func printDHCPv4(packet gopacket.Packet) {
-	// for _, b := range packet.Data() {
-	// 	fmt.Printf("0x%02x,", b)
-	// }
-	// fmt.Println()
+// func printDHCPv4(packet gopacket.Packet) {
+// 	// for _, b := range packet.Data() {
+// 	// 	fmt.Printf("0x%02x,", b)
+// 	// }
+// 	// fmt.Println()
 
-	dhcpLayer := packet.Layer(layers.LayerTypeDHCPv4)
-	if dhcpLayer == nil {
-		return
-	}
+// 	dhcpLayer := packet.Layer(layers.LayerTypeDHCPv4)
+// 	if dhcpLayer == nil {
+// 		return
+// 	}
 
-	fmt.Println("{")
-	for _, b := range dhcpLayer.LayerContents() {
-		fmt.Printf("0x%02x,", b)
-	}
-	fmt.Println("},")
+// 	fmt.Printf("{")
+// 	for _, b := range dhcpLayer.LayerContents() {
+// 		fmt.Printf("0x%02x,", b)
+// 	}
+// 	fmt.Println("},")
 
-}
+// }
